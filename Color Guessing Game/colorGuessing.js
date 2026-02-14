@@ -1,196 +1,275 @@
-var colorDisplay = document.querySelector('#colorDisplay');
-var messageDisplay = document.querySelector('#message');
-var currentStreakDisplay = document.querySelector('#CurrentStreak');
-var bestStreakDisplay = document.querySelector('#bestStreak');
-var colorBoxes = document.querySelectorAll('.color-box');
-var newRoundBtn = document.querySelector('#newRoundBtn');
-var easyBtn = document.querySelector('#easyBtn');
-var hardBtn = document.querySelector('#hardBtn');
-var resetStreakBtn = document.querySelector('#resetStreakBtn');
-var btnTrack = document.querySelector('.color-box-container');//--> 6 box ka baap
-var video = document.querySelector('#video');
-var image = document.querySelector('#image');
-var currentStreak = 0;
-var bestStreak = 0;
-//var currectColor = null;
-var color = [];
-var num = 6;
-var pickCorrectColor = 0;
+// RGB Master - Core Game Logic
+const colorDisplay = document.querySelector("#colorDisplay");
+const messageDisplay = document.querySelector("#message");
+const currentStreakDisplay = document.querySelector("#CurrentStreak");
+const bestStreakDisplay = document.querySelector("#bestStreak");
+const comboBadge = document.querySelector("#comboBadge");
+const colorBoxContainer = document.querySelector("#colorBoxContainer");
+const newRoundBtn = document.querySelector("#newRoundBtn");
+const easyBtn = document.querySelector("#easyBtn");
+const hardBtn = document.querySelector("#hardBtn");
+const resetStreakBtn = document.querySelector("#resetStreakBtn");
+const bgVideo = document.querySelector("#bgVideo");
 
+let currentStreak = 0;
+let bestStreak = localStorage.getItem("highBestStreak") ? parseInt(localStorage.getItem("highBestStreak")) : 0;
+let colors = [];
+let difficulty = 6;
+let pickedColor;
+let isGameActive = true;
+let comboMultiplier = 1;
 
-function webLoad() {
-    onload();
-    setGame();
-    displayContent();
+function init() {
+  setupModeButtons();
+  setupActionButtons();
+  syncDifficultyUI();
+  resetGame();
+  bestStreakDisplay.textContent = bestStreak;
 }
 
-
-// whenever the website will load then first it will load the entire data....
-function onload() {
-    var temp = localStorage.getItem('highBestStreak');
-
-    if (temp != null) {
-        bestStreak = parseInt(temp);  //-->here the local organ contains the data so it will return the data not null.
-    }
-    else {
-        bestStreak = 0;  //--> if there is no data in localstorage so it wwill return null instead of number.
-    }
-
-}
-// here we difine the display content message in a functions format..
-function displayContent() {
-    currentStreakDisplay.textContent = currentStreak;
-    bestStreakDisplay.textContent = bestStreak;
-
+function syncDifficultyUI() {
+  const thumb = document.querySelector(".toggle-thumb");
+  if (difficulty === 6) {
+    hardBtn.classList.add("selected");
+    easyBtn.classList.remove("selected");
+    if (thumb) thumb.style.transform = "translateX(22px)";
+  } else {
+    easyBtn.classList.add("selected");
+    hardBtn.classList.remove("selected");
+    if (thumb) thumb.style.transform = "translateX(0)";
+  }
 }
 
-function statuMsg(msg) {
-    messageDisplay.textContent = msg;
+function setupModeButtons() {
+  const thumb = document.querySelector(".toggle-thumb");
+
+  easyBtn.addEventListener("click", function () {
+    difficulty = 3;
+    this.classList.add("selected");
+    hardBtn.classList.remove("selected");
+    if (thumb) thumb.style.transform = "translateX(0)";
+    resetGame();
+  });
+
+  hardBtn.addEventListener("click", function () {
+    difficulty = 6;
+    this.classList.add("selected");
+    easyBtn.classList.remove("selected");
+    if (thumb) thumb.style.transform = "translateX(22px)";
+    resetGame();
+  });
 }
 
-function forEays() {
-    easyBtn.style.backgroundColor = "white";
-    easyBtn.style.color = "Black";
-    hardBtn.style.backgroundColor = "Black";
-    hardBtn.style.color = "white";
-    color.length = 3;
-    num = 3
-
-    for (var i = 3; i < 6; i++) {
-        colorBoxes[i].style.display = "none";
-    }
-
-}
-function forhard() {
-    hardBtn.style.backgroundColor = "white";
-    hardBtn.style.color = "Black";
-    easyBtn.style.backgroundColor = "Black";
-    easyBtn.style.color = "white";
-    color.length = 6;
-    num = 6
-    for (var i = 0; i < 6; i++) {
-        colorBoxes[i].style.display = "block";
-    }
-
-}
-
-//random color generator
-function colorGenerate() {
-    var a = Math.floor(Math.random() * 256);
-    var b = Math.floor(Math.random() * 256);
-    var c = Math.floor(Math.random() * 256);
-    return `rgb(${a}, ${b}, ${c})`;
-}
-function generateColor(num) { // num->6 i=0,color generate ->rgb(122,25,88),,,,,,,i=6-> colorGenerate 
-    const arr = [];
-    for (var i = 0; i < num; i++) {
-        arr.push(colorGenerate());
-    }
-    return arr;
-}
-
-function pickGenerator() {
-    const pic = Math.floor(Math.random() * color.length);
-    console.log(color.length)
-    return color[pic];
-}
-
-
-
-function setGame() {
-
-    color = generateColor(num);
-    console.log(color);
-    pickCorrectColor = pickGenerator();
-
-    console.log(pickCorrectColor);
-    colorDisplay.textContent = pickCorrectColor;
-
-    for (var i = 0; i < color.length; i++) {
-        colorBoxes[i].style.backgroundColor = color[i];
-    }
-    video.style.display = "none";
-    image.style.display = "block";
-
-}
-//for auto reset
-function timer() {
-    var timerepet = 0;
-    var time = setInterval(function () {
-        timerepet++;
-        setGame();
-        if (timerepet > 0) {
-            clearInterval(time)
-        }
-        statuMsg("Next Round Starting...")
-    }, 1500)
-}
-
-
-//parent box me addeventlisner  if-->parent par lagaya jishshe ham iske chils par kam kar shake
-
-function trackBtn(event) {
-    const element = event.target;
-    console.log(element)
-    const rgb = element.style.backgroundColor;
-    console.log(rgb)
-   var right=0;
-    if (rgb === pickCorrectColor) {
-        currentStreak++;
-        displayContent();
-        statuMsg("🎉 You Win!")
-        element.disabled = true;
-        for (var i = 0; i < 6; i++) {
-            colorBoxes[i].style.backgroundColor = rgb;
-            colorBoxes[i].style.opacity = "1";
-        }
-        video.style.display = "block";
-        image.style.display = "none";
-        if (currentStreak > bestStreak) {
-
-            localStorage.setItem('highBestStreak', currentStreak)
-            bestStreak = currentStreak
-
-            webLoad();
-            displayContent();
-
-        }
-        timer()
-
-
-
-
-    }
-    else {
-        right++;
-        statuMsg(` ❌ Try Again! your current Streak is ${currentStreak}  ${right}`)
-        currentStreak = 0;
-        displayContent();
-        
-          timer()
-
- onload();
-
-    }
-}
-
-
-btnTrack.addEventListener('click', trackBtn);
-hardBtn.addEventListener('click', forhard)
-easyBtn.addEventListener('click', forEays);
-resetStreakBtn.addEventListener('click', () => {
+function setupActionButtons() {
+  newRoundBtn.addEventListener("click", () => {
     currentStreak = 0;
-    localStorage.removeItem('highBestStreak');
-    webLoad();
-    displayContent();
-    statuMsg("🔄 Streak Reset!");
+    comboMultiplier = 1;
+    updateStats();
+    resetGame();
+  });
 
-});
-newRoundBtn.addEventListener('click', () => {
+  resetStreakBtn.addEventListener("click", () => {
     currentStreak = 0;
+    comboMultiplier = 1;
+    bestStreak = 0;
+    localStorage.removeItem("highBestStreak");
+    updateStats();
+    resetGame();
+    showMessage("SYSTEM RESET COMPLETE");
+  });
+}
 
-    displayContent();
-    webLoad();
-})
+let pressureTimer;
 
-webLoad();
+function resetGame() {
+  isGameActive = true;
+  colors = generateRandomColors(difficulty);
+  pickedColor = pickColor();
+  colorDisplay.textContent = pickedColor.toUpperCase();
+
+  // UI Cleanup
+  colorBoxContainer.innerHTML = "";
+  messageDisplay.textContent = "SELECT THE FREQUENCY";
+  messageDisplay.style.color = "var(--primary)";
+
+  // Smooth video fade out if it was on
+  bgVideo.classList.remove("visible");
+  setTimeout(() => {
+    if (!bgVideo.classList.contains("visible")) {
+      bgVideo.style.display = "none";
+    }
+  }, 2000);
+
+  document.body.classList.remove("pressure-active");
+  clearTimeout(pressureTimer);
+
+  // Start pressure pulse after 5 seconds of hesitation
+  pressureTimer = setTimeout(() => {
+    if (isGameActive) {
+      document.body.classList.add("pressure-active");
+      showMessage("TIME IS RUNNING OUT...");
+    }
+  }, 5000);
+
+  createColorBoxes();
+}
+
+function createColorBoxes() {
+  for (let i = 0; i < colors.length; i++) {
+    const box = document.createElement("div");
+    box.classList.add("color-box");
+    box.style.backgroundColor = colors[i];
+
+    box.addEventListener("click", function () {
+      if (!isGameActive) return;
+      handleChoice(this, colors[i]);
+    });
+
+    colorBoxContainer.appendChild(box);
+  }
+}
+
+function handleChoice(element, color) {
+  if (color === pickedColor) {
+    handleWin(element);
+  } else {
+    handleLoss(element);
+  }
+}
+
+function handleWin(element) {
+  isGameActive = false;
+  currentStreak++;
+  clearTimeout(pressureTimer);
+  document.body.classList.remove("pressure-active");
+
+  // Combo Logic
+  if (currentStreak % 3 === 0) comboMultiplier++;
+
+  if (currentStreak > bestStreak) {
+    bestStreak = currentStreak;
+    localStorage.setItem("highBestStreak", bestStreak);
+  }
+
+  showMessage("ACCESS GRANTED - HARMONIC MATCH");
+  element.style.boxShadow = "0 0 30px white, 0 0 60px " + pickedColor;
+
+  // Sync with Visual FX if exists
+  if (window.vFX) {
+    const rect = element.getBoundingClientRect();
+    window.vFX.createParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, pickedColor);
+  }
+
+  updateStats();
+  changeAllToWinnerColor(pickedColor);
+
+  // Trigger video on milestones with smooth fade
+  if (currentStreak >= 5) {
+    bgVideo.style.display = "block";
+    // Force reflow for transition
+    bgVideo.offsetHeight;
+    bgVideo.classList.add("visible");
+    bgVideo.play();
+  }
+
+  setTimeout(resetGame, 1800);
+}
+
+function handleLoss(element) {
+  isGameActive = false;
+  currentStreak = 0;
+  comboMultiplier = 1;
+  clearTimeout(pressureTimer);
+  document.body.classList.remove("pressure-active");
+
+  showMessage("ACCESS DENIED - FREQUENCY MISMATCH");
+  element.classList.add("shake");
+  messageDisplay.style.color = "var(--accent)";
+
+  updateStats();
+
+  setTimeout(() => {
+    element.style.opacity = "0";
+    setTimeout(resetGame, 1000);
+  }, 500);
+}
+
+function changeAllToWinnerColor(color) {
+  const boxes = document.querySelectorAll(".color-box");
+  boxes.forEach(box => {
+    box.style.backgroundColor = color;
+    box.style.opacity = "1";
+  });
+}
+
+function pickColor() {
+  const random = Math.floor(Math.random() * colors.length);
+  return colors[random];
+}
+
+function generateRandomColors(num) {
+  const arr = [];
+  // Dynamic difficulty: shades get closer as streak increases
+  // Hard mode (num=6) starts with a more challenging variance
+  const startVariance = num === 6 ? 120 : 255;
+  const variance = Math.max(20, startVariance - (currentStreak * 15));
+
+  // First color is truly random or base for the round
+  const baseR = Math.floor(Math.random() * 256);
+  const baseG = Math.floor(Math.random() * 256);
+  const baseB = Math.floor(Math.random() * 256);
+
+  for (let i = 0; i < num; i++) {
+    const isHardTarget = num === 6 || currentStreak > 3;
+
+    if (isHardTarget) {
+      // Generate colors close to each other
+      const r = clamp(baseR + (Math.random() - 0.5) * variance);
+      const g = clamp(baseG + (Math.random() - 0.5) * variance);
+      const b = clamp(baseB + (Math.random() - 0.5) * variance);
+      arr.push(`rgb(${r}, ${g}, ${b})`);
+    } else {
+      arr.push(randomColor());
+    }
+  }
+  return arr;
+}
+
+function randomColor() {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function clamp(val) {
+  return Math.min(255, Math.max(0, Math.floor(val)));
+}
+
+function updateStats() {
+  currentStreakDisplay.textContent = currentStreak;
+  bestStreakDisplay.textContent = bestStreak;
+
+  const oldCombo = comboBadge.textContent;
+  comboBadge.textContent = `x${comboMultiplier}`;
+
+  if (`x${comboMultiplier}` !== oldCombo) {
+    comboBadge.classList.remove("pop");
+    void comboBadge.offsetWidth; // Force reflow
+    comboBadge.classList.add("pop");
+  }
+
+  if (currentStreak >= 3) {
+    currentStreakDisplay.classList.add("pulse");
+  } else {
+    currentStreakDisplay.classList.remove("pulse");
+  }
+}
+
+function showMessage(msg) {
+  messageDisplay.textContent = msg;
+}
+
+// Start the engine
+init();
+
