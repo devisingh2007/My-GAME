@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RGB Master | Premium Color Challenge</title>
+    <link rel="icon" type="image/png"
+        href="https://res.cloudinary.com/dewymrwzf/image/upload/v1770486944/ChatGPT_Image_Feb_7_2026_11_24_48_PM_jxuz9q.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Outfit:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="colorGuessing.css">
+</head>
+
+<body>
+    <!-- Background Layers -->
+    <div id="bg-canvas-container">
+        <canvas id="hex-canvas"></canvas>
+        <div class="abstract-overlay"></div>
+        <div class="particle-container"></div>
+    </div>
+
+    <div class="cinematic-intro" id="introOverlay">
+        <div class="intro-content">
+            <h1 class="glitch-text" data-text="RGB MASTER">RGB MASTER</h1>
+            <p>PREMIUM COLOR CHALLENGE</p>
+            <div class="loading-bar"><span></span></div>
+        </div>
+    </div>
+
+    <div class="container main-ui" id="mainGameContainer">
+        <header>
+            <div class="logo-area">
+                <span class="badge">BETA 2.0</span>
+                <h1 class="main-title">THE GREAT</h1>
+            </div>
+            <div class="color-display-wrapper glass-panel">
+                <h1 id="colorDisplay" class="color-display">RGB(0, 0, 0)</h1>
+                <div class="pulse-ring"></div>
+            </div>
+            <p class="subtitle">DECIPHER THE SPECTRUM</p>
+        </header>
+
+        <div class="game-stats">
+            <div class="streak-section">
+                <div class="stat-card glass-panel" id="currentStreakCard">
+                    <span class="stat-label">CURRENT STREAK</span>
+                    <div class="stat-value streak-number" id="CurrentStreak">0</div>
+                    <div class="combo-badge" id="comboBadge">x1</div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <span class="stat-label">ELITE RECORD</span>
+                    <div class="stat-value streak-number" id="bestStreak">0</div>
+                </div>
+            </div>
+
+            <div class="message-area glass-panel">
+                <div class="message" id="message">INITIATING SYSTEM...</div>
+            </div>
+        </div>
+
+        <div class="game-controls glass-panel">
+            <div class="mode-toggle">
+                <button id="easyBtn" class="mode-btn">EASY</button>
+                <div class="toggle-track">
+                    <div class="toggle-thumb"></div>
+                </div>
+                <button id="hardBtn" class="mode-btn selected">HARD</button>
+            </div>
+            <div class="action-btns">
+                <button class="control-btn primary" id="newRoundBtn">
+                    <span class="btn-text">NEW ROUND</span>
+                    <div class="btn-glow"></div>
+                </button>
+                <button class="control-btn secondary" id="resetStreakBtn">RESET</button>
+            </div>
+        </div>
+
+        <div class="color-box-grid" id="colorBoxContainer">
+            <!-- Dynamically generated color boxes -->
+        </div>
+    </div>
+
+    <!-- Hidden assets for effects -->
+    <img src="./abstract-triangles-background.jpg" alt="" id="bgImage" style="display:none;">
+    <video src="./217490.mp4" muted loop id="bgVideo" style="display:none;"></video>
+
+    <script src="visualEffects.js"></script>
+    <script src="colorGuessing.js"></script>
+</body>
+
+</html>
